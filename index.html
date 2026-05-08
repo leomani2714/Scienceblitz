@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScienceBlitz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0a0f0a; --bg2:#101a10; --bg3:#182018;
+      --surface:#1a241a; --surface2:#202e20;
+      --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.14);
+      --accent:#00c896; --accent2:#4dffd2;
+      --accent-glow:rgba(0,200,150,0.35);
+      --blue:#4d9fff; --blue-dim:rgba(77,159,255,0.15);
+      --green:#3dffa0; --green-dim:rgba(61,255,160,0.15);
+      --red:#ff5c7a; --red-dim:rgba(255,92,122,0.15);
+      --gold:#ffd14d; --gold-dim:rgba(255,209,77,0.15);
+      --purple:#c084fc; --purple-dim:rgba(192,132,252,0.15);
+      --orange:#fb923c; --orange-dim:rgba(251,146,60,0.15);
+      --text:#e8fff5; --text2:#7aaa90; --text3:#456050;
+      --r-sm:8px; --r-md:14px; --r-lg:20px; --r-xl:28px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,200,150,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,150,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+    body::after{content:'';position:fixed;top:-30%;left:50%;transform:translateX(-50%);width:80vw;height:60vh;background:radial-gradient(ellipse,rgba(0,200,150,0.07) 0%,transparent 70%);pointer-events:none;z-index:0;}
+    .game-wrap{position:relative;z-index:1;width:100%;max-width:560px;}
+
+    /* HEADER */
+    .game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .logo{font-size:22px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--accent2),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .header-btns{display:flex;gap:8px;}
+    .icon-btn{width:36px;height:36px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--text2);}
+    .icon-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--accent);}
+
+    /* CARD */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 24px;}
+
+    /* START SCREEN */
+    #startScreen{display:block;}
+    .start-title{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:4px;background:linear-gradient(135deg,#fff 40%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .start-sub{font-size:14px;color:var(--text2);margin-bottom:24px;}
+    .section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:20px;}
+
+    /* Subject toggle */
+    .subject-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
+    .subj-btn{padding:16px 8px;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r-md);cursor:pointer;text-align:center;transition:all 0.2s;}
+    .subj-btn:hover{border-color:var(--accent);}
+    .subj-btn.active.phys{border-color:var(--blue);background:var(--blue-dim);}
+    .subj-btn.active.chem{border-color:var(--purple);background:var(--purple-dim);}
+    .subj-icon{font-size:28px;margin-bottom:6px;}
+    .subj-name{font-size:15px;font-weight:800;color:var(--text);}
+    .subj-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+
+    /* Difficulty */
+    .diff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .diff-btn{padding:12px 8px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r-md);cursor:pointer;text-align:center;transition:all 0.15s;}
+    .diff-btn:hover{border-color:var(--accent);}
+    .diff-btn.active{border-color:var(--accent);background:rgba(0,200,150,0.12);}
+    .diff-btn .d-name{font-size:15px;font-weight:700;color:var(--text);}
+    .diff-btn .d-meta{font-size:11px;color:var(--text2);margin-top:2px;font-family:'JetBrains Mono',monospace;}
+
+    /* Topic pills */
+    .topic-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+    .topic-pill{padding:6px 12px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);transition:all 0.15s;}
+    .topic-pill:hover{border-color:var(--accent);color:var(--text);}
+    .topic-pill.active{background:rgba(0,200,150,0.12);border-color:var(--accent);color:var(--accent2);}
+
+    /* Options */
+    .opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .opt-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .opt-item label{font-size:13px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:8px;}
+    .opt-item.full{grid-column:1/-1;}
+    .opt-item select{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:5px 8px;color:var(--text);font-size:13px;font-family:'Syne',sans-serif;outline:none;cursor:pointer;}
+    .toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;inset:0;background:var(--surface2);border-radius:11px;cursor:pointer;transition:0.2s;border:1px solid var(--border2);}
+    .slider::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;left:2px;top:2px;background:var(--text3);transition:0.2s;}
+    .toggle input:checked+.slider{background:var(--accent);border-color:var(--accent);}
+    .toggle input:checked+.slider::before{transform:translateX(18px);background:white;}
+    .start-btn{width:100%;margin-top:20px;padding:16px;font-size:16px;font-weight:700;letter-spacing:0.5px;font-family:'Syne',sans-serif;background:linear-gradient(135deg,var(--accent),#009970);border:none;border-radius:var(--r-md);color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 8px 32px rgba(0,200,150,0.3);}
+    .start-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,200,150,0.45);}
+    .start-btn:active{transform:scale(0.98);}
+
+    /* GAME SCREEN */
+    #gameScreen{display:none;}
+    .stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+    .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px;text-align:center;}
+    .stat-box .s-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .stat-box .s-val{font-size:20px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;line-height:1.2;margin-top:2px;}
+    .stat-box.accent-box{border-color:rgba(0,200,150,0.3);background:rgba(0,200,150,0.07);}
+    .stat-box.accent-box .s-val{color:var(--accent2);}
+    .stat-box.gold-box{border-color:rgba(255,209,77,0.3);background:rgba(255,209,77,0.07);}
+    .stat-box.gold-box .s-val{color:var(--gold);}
+    .stat-box.green-box{border-color:rgba(61,255,160,0.3);background:rgba(61,255,160,0.07);}
+    .stat-box.green-box .s-val{color:var(--green);}
+
+    /* Timer */
+    .timer-bar-wrap{margin-bottom:14px;}
+    .timer-row{display:flex;align-items:center;gap:10px;}
+    .timer-countdown{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;min-width:54px;text-align:right;color:var(--accent2);transition:color 0.4s;flex-shrink:0;}
+    .timer-countdown.warn{color:var(--gold);}
+    .timer-countdown.danger{color:var(--red);animation:timerPulse 0.5s ease-in-out infinite;}
+    @keyframes timerPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+    .timer-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+    .timer-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--green));transition:width 1s linear,background 0.5s;}
+    .timer-bar-fill.warn{background:linear-gradient(90deg,var(--gold),#ff9933);}
+    .timer-bar-fill.danger{background:linear-gradient(90deg,var(--red),#ff3333);}
+    .timer-label{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;flex-shrink:0;}
+
+    /* Lives */
+    .lives-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;}
+    .heart{font-size:22px;transition:transform 0.3s,opacity 0.3s;}
+    .heart.lost{opacity:0.18;transform:scale(0.75);}
+    @keyframes heartLost{0%{transform:scale(1.4);}50%{transform:scale(0.6);}100%{transform:scale(0.75);}}
+    .heart.losing{animation:heartLost 0.4s ease forwards;}
+
+    /* Combo banner */
+    .combo-banner{display:flex;align-items:center;justify-content:center;gap:8px;height:32px;margin-bottom:12px;font-size:13px;font-weight:700;letter-spacing:0.5px;transition:all 0.3s;opacity:0;}
+    .combo-banner.visible{opacity:1;}
+    .combo-fire{font-size:18px;}
+    .combo-text{color:var(--gold);}
+    .combo-mult{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(255,209,77,0.4);border-radius:6px;padding:2px 8px;font-size:12px;}
+
+    /* XP bar */
+    .xp-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+    .xp-label{font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;white-space:nowrap;min-width:52px;}
+    .xp-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+    .xp-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+    .xp-next{font-size:10px;color:var(--text3);white-space:nowrap;}
+
+    /* Question card */
+    .q-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px 20px 20px;margin-bottom:12px;position:relative;transition:all 0.2s;}
+    .q-card-top{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+    .q-type-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(0,200,150,0.12);color:var(--accent2);border:1px solid rgba(0,200,150,0.25);}
+    .subject-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+    .subject-badge.phys{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(77,159,255,0.3);}
+    .subject-badge.chem{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(192,132,252,0.3);}
+    .q-text{font-size:20px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:16px;word-break:break-word;}
+    .q-text.slide-in{animation:slideIn 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+    @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+    /* Choices */
+    .choices-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+    .choice-btn{padding:14px 12px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r-md);cursor:pointer;font-size:15px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif;transition:all 0.15s;text-align:left;position:relative;word-break:break-word;}
+    .choice-btn:hover{border-color:var(--accent);background:rgba(0,200,150,0.08);transform:translateY(-1px);}
+    .choice-btn.correct{border-color:var(--green)!important;background:var(--green-dim)!important;color:var(--green)!important;}
+    .choice-btn.wrong{border-color:var(--red)!important;background:var(--red-dim)!important;color:var(--red)!important;}
+    .choice-btn .kbd-hint{position:absolute;top:4px;right:7px;font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+    /* Feedback */
+    .feedback{min-height:28px;padding:6px 12px;border-radius:var(--r-sm);font-size:14px;font-weight:700;text-align:center;margin-top:10px;transition:all 0.2s;opacity:0;}
+    .feedback.show{opacity:1;}
+    .feedback.correct{background:var(--green-dim);color:var(--green);}
+    .feedback.wrong{background:var(--red-dim);color:var(--red);}
+    .feedback.hidden{display:none;}
+
+    /* Hint box */
+    .hint-box{margin-top:12px;padding:10px 14px;background:rgba(255,209,77,0.08);border:1px solid rgba(255,209,77,0.3);border-radius:var(--r-sm);font-size:13px;color:var(--gold);line-height:1.6;}
+
+    /* Controls */
+    .game-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+    .ctrl-btn{padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text2);cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;}
+    .ctrl-btn:hover{border-color:var(--border2);color:var(--text);background:var(--surface2);}
+    .ctrl-btn:disabled{opacity:0.4;cursor:default;}
+
+    /* Toasts */
+    .levelup-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:linear-gradient(135deg,var(--accent),#009970);color:white;padding:12px 24px;border-radius:40px;font-size:15px;font-weight:700;letter-spacing:0.5px;box-shadow:0 8px 32px rgba(0,200,150,0.5);z-index:9999;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;}
+    .levelup-toast.show{transform:translateX(-50%) translateY(0);}
+    .speed-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-60px);background:var(--gold-dim);color:var(--gold);border:1px solid rgba(255,209,77,0.5);padding:8px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:9998;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;}
+    .speed-toast.show{transform:translateX(-50%) translateY(0);}
+
+    /* Flash / shake */
+    .flash-overlay{position:fixed;inset:0;pointer-events:none;z-index:9990;}
+    @keyframes flash-green{0%,100%{opacity:0;}30%{opacity:1;background:rgba(61,255,160,0.08);}}
+    @keyframes flash-red{0%,100%{opacity:0;}30%{opacity:1;background:rgba(255,92,122,0.1);}}
+    .flash-overlay.correct{animation:flash-green 0.5s ease-out;}
+    .flash-overlay.wrong{animation:flash-red 0.5s ease-out;}
+    @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-7px);}40%,80%{transform:translateX(7px);}}
+    .shaking{animation:shake 0.35s ease-in-out;}
+    .confetti-piece{position:fixed;pointer-events:none;font-size:18px;}
+    @keyframes cffall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(340px) rotate(720deg);opacity:0;}}
+    .burst-p{position:fixed;pointer-events:none;font-size:20px;}
+    @keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}}
+
+    /* Pause overlay */
+    #pauseOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;z-index:10000;}
+    #pauseOverlay.show{display:flex;}
+    .pause-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-xl);padding:32px 28px;text-align:center;min-width:280px;}
+    .pause-card h2{font-size:28px;font-weight:800;margin-bottom:6px;}
+    .pause-card p{font-size:14px;color:var(--text2);margin-bottom:24px;}
+    .pause-card .ctrl-btn{width:100%;justify-content:center;margin-bottom:8px;padding:12px;}
+
+    /* END SCREEN */
+    #endScreen{display:none;}
+    .end-hero{text-align:center;margin-bottom:24px;}
+    .end-emoji{font-size:48px;margin-bottom:8px;}
+    .end-score{font-size:52px;font-weight:800;letter-spacing:-2px;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .end-msg{font-size:15px;color:var(--text2);margin-top:4px;}
+    .end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+    .end-stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;text-align:center;}
+    .end-stat-box .es-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--text);}
+    .end-stat-box .es-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+    .lb-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+    .lb-list{display:grid;gap:6px;margin-bottom:20px;}
+    .lb-row{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:13px;}
+    .lb-row.lb-you{border-color:rgba(0,200,150,0.35);background:rgba(0,200,150,0.07);}
+    .lb-rank{font-size:14px;width:22px;text-align:center;flex-shrink:0;}
+    .lb-info{flex:1;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;}
+    .lb-score{font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;}
+    .lb-pct{font-size:11px;color:var(--accent2);margin-left:6px;}
+    .review-wrap{max-height:220px;overflow-y:auto;display:grid;gap:6px;margin-bottom:20px;padding-right:4px;}
+    .review-wrap::-webkit-scrollbar{width:4px;}
+    .review-wrap::-webkit-scrollbar-track{background:var(--bg3);border-radius:2px;}
+    .review-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+    .rv-item{background:var(--bg3);border-left:3px solid var(--border2);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;}
+    .rv-item.rv-correct{border-left-color:var(--green);}
+    .rv-item.rv-wrong{border-left-color:var(--red);}
+    .rv-q{font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;margin-bottom:2px;}
+    .rv-a{color:var(--text2);font-size:11px;}
+
+    /* Topic breakdown chart */
+    .topic-chart{margin-bottom:16px;}
+    .topic-chart-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+    .tc-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+    .tc-label{font-size:11px;color:var(--text2);width:120px;flex-shrink:0;text-align:right;}
+    .tc-bar-wrap{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+    .tc-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);}
+    .tc-bar.perfect{background:linear-gradient(90deg,var(--green),#00cc66);}
+    .tc-bar.bad{background:linear-gradient(90deg,var(--red),#ff9933);}
+    .tc-pct{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;width:32px;flex-shrink:0;}
+
+    .play-again-btn{width:100%;padding:15px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--accent),#009970);border:none;border-radius:var(--r-md);color:white;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s;box-shadow:0 8px 24px rgba(0,200,150,0.3);}
+    .play-again-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,200,150,0.45);}
+    .hidden{display:none!important;}
+
+    /* Light mode */
+    body.light{--bg:#f0fff8;--bg2:#e0f5ec;--bg3:#d8f0e8;--surface:#ffffff;--surface2:#eafaf2;--border:rgba(0,150,100,0.1);--border2:rgba(0,150,100,0.2);--text:#0a2018;--text2:#3a7060;--text3:#8ab0a0;}
+    body.light .q-card{background:#f0fff8;}
+  </style>
+</head>
+<body>
+
+<div class="game-wrap">
+  <div class="game-header">
+    <div class="logo">⚗️ ScienceBlitz</div>
+    <div class="header-btns">
+      <button class="icon-btn" id="themeBtn" title="Toggle theme">☀️</button>
+      <button class="icon-btn" id="sfxBtn" title="Toggle sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="card">
+      <div class="start-title">ScienceBlitz</div>
+      <div class="start-sub">Master Physics &amp; Chemistry — one question at a time ⚗️</div>
+
+      <div class="section-label">Subject</div>
+      <div class="subject-row" id="subjectRow">
+        <div class="subj-btn active phys" data-subj="physics">
+          <div class="subj-icon">⚡</div>
+          <div class="subj-name">Physics</div>
+          <div class="subj-desc">Forces, energy, waves</div>
+        </div>
+        <div class="subj-btn chem" data-subj="chemistry">
+          <div class="subj-icon">🧪</div>
+          <div class="subj-name">Chemistry</div>
+          <div class="subj-desc">Elements, reactions, bonds</div>
+        </div>
+      </div>
+
+      <div class="section-label">Difficulty</div>
+      <div class="diff-row" id="diffRow">
+        <div class="diff-btn active" data-diff="easy"><div class="d-name">Easy</div><div class="d-meta">Foundation</div></div>
+        <div class="diff-btn" data-diff="medium"><div class="d-name">Medium</div><div class="d-meta">GCSE level</div></div>
+        <div class="diff-btn" data-diff="hard"><div class="d-name">Hard</div><div class="d-meta">A-level / JEE</div></div>
+      </div>
+
+      <div class="section-label">Topics — <span id="topicSubjLabel">Physics</span></div>
+      <div class="topic-wrap" id="topicWrap"></div>
+
+      <div class="section-label" style="margin-top:20px">Options</div>
+      <div class="opts-grid">
+        <div class="opt-item">
+          <label for="timerToggle">⏱ Timer</label>
+          <label class="toggle"><input type="checkbox" id="timerToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="opt-item">
+          <label for="livesToggle">❤️ Lives (3)</label>
+          <label class="toggle"><input type="checkbox" id="livesToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="opt-item">
+          <label for="hintToggle">💡 Hints</label>
+          <label class="toggle"><input type="checkbox" id="hintToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="opt-item">
+          <label for="qCountSel">Questions</label>
+          <select id="qCountSel">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div class="opt-item">
+          <label for="timeSel">Time per Q</label>
+          <select id="timeSel">
+            <option value="30">30 s</option>
+            <option value="45" selected>45 s</option>
+            <option value="60">60 s</option>
+            <option value="90">90 s</option>
+          </select>
+        </div>
+        <div class="opt-item">
+          <label for="mixToggle">🔀 Mix both</label>
+          <label class="toggle"><input type="checkbox" id="mixToggle"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <button class="start-btn" id="startBtn">Start →</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen">
+    <div class="card">
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-box accent-box"><div class="s-label">Score</div><div class="s-val" id="scoreEl">0</div></div>
+        <div class="stat-box gold-box"><div class="s-label">Streak 🔥</div><div class="s-val" id="streakEl">0</div></div>
+        <div class="stat-box green-box"><div class="s-label">Accuracy</div><div class="s-val" id="accuracyEl">—</div></div>
+        <div class="stat-box"><div class="s-label">Q #</div><div class="s-val" id="qNumEl">1</div></div>
+      </div>
+
+      <!-- Lives -->
+      <div class="lives-row" id="livesRow">
+        <span class="heart" id="h1">❤️</span>
+        <span class="heart" id="h2">❤️</span>
+        <span class="heart" id="h3">❤️</span>
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-bar-wrap" id="timerBarWrap">
+        <div class="timer-row">
+          <span class="timer-label">Time</span>
+          <div class="timer-track"><div class="timer-bar-fill" id="timerBarFill" style="width:100%"></div></div>
+          <span class="timer-countdown" id="timerCountdown">45</span>
+        </div>
+      </div>
+
+      <!-- Combo -->
+      <div class="combo-banner" id="comboBanner">
+        <span class="combo-fire">🔥</span>
+        <span class="combo-text" id="comboText">On fire!</span>
+        <span class="combo-mult" id="comboMult">×2</span>
+      </div>
+
+      <!-- XP -->
+      <div class="xp-row">
+        <div class="xp-label" id="xpLabel">Lv 1</div>
+        <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+        <div class="xp-next" id="xpNext">0 / 100 XP</div>
+      </div>
+
+      <!-- Question card -->
+      <div class="q-card" id="qCard">
+        <div class="q-card-top">
+          <div class="q-type-badge" id="qTypeBadge">Physics</div>
+          <div class="subject-badge phys" id="subjectBadge">⚡ Physics</div>
+        </div>
+        <div class="q-text" id="qText">Loading…</div>
+        <div class="choices-grid" id="choicesGrid"></div>
+        <div class="feedback hidden" id="feedbackEl"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="ctrl-btn" id="hintBtn">💡 Hint</button>
+        <button class="ctrl-btn" id="skipBtn">⏭ Skip</button>
+        <button class="ctrl-btn" id="pauseBtn">⏸ Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="endScreen">
+    <div class="card">
+      <div class="end-hero">
+        <div class="end-emoji" id="endEmoji">🎉</div>
+        <div class="end-score" id="endScore">0</div>
+        <div class="end-msg" id="endMsg">Well done!</div>
+      </div>
+      <div class="end-stats">
+        <div class="end-stat-box"><div class="es-val" id="endAccuracy">—</div><div class="es-label">Accuracy</div></div>
+        <div class="end-stat-box"><div class="es-val" id="endBestStreak">0</div><div class="es-label">Best Streak</div></div>
+        <div class="end-stat-box"><div class="es-val" id="endXP">0</div><div class="es-label">XP Earned</div></div>
+      </div>
+      <div class="topic-chart" id="topicChart"></div>
+      <div class="lb-title">🏆 Leaderboard</div>
+      <div class="lb-list" id="lbList"></div>
+      <div class="lb-title">📋 Review</div>
+      <div class="review-wrap" id="reviewWrap"></div>
+      <button class="play-again-btn" id="playAgainBtn">Play Again →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlays -->
+<div id="pauseOverlay">
+  <div class="pause-card">
+    <h2>⏸ Paused</h2>
+    <p>Take a breath…</p>
+    <button class="ctrl-btn" id="resumeBtn">▶ Resume</button>
+    <button class="ctrl-btn" id="quitBtn">🚪 Quit Game</button>
+  </div>
+</div>
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="levelup-toast" id="levelupToast">⬆ Level Up!</div>
+<div class="speed-toast" id="speedToast">⚡ Speed Bonus!</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  QUESTION BANK
+// ══════════════════════════════════════════════════════
+const QB = {
+  physics: {
+    mechanics: {
+      easy: [
+        { q:"What is the SI unit of force?", a:"Newton", opts:["Newton","Joule","Watt","Pascal"] },
+        { q:"Speed = Distance ÷ ?", a:"Time", opts:["Time","Mass","Force","Energy"] },
+        { q:"What force pulls objects toward Earth?", a:"Gravity", opts:["Gravity","Friction","Tension","Normal force"] },
+        { q:"Which quantity has both magnitude and direction?", a:"Vector", opts:["Vector","Scalar","Speed","Distance"] },
+        { q:"Unit of acceleration?", a:"m/s²", opts:["m/s²","m/s","kg","N"] },
+        { q:"Newton's first law is also called the law of?", a:"Inertia", opts:["Inertia","Momentum","Gravity","Motion"] },
+        { q:"Work = Force × ?", a:"Displacement", opts:["Displacement","Time","Mass","Velocity"] },
+        { q:"What is 10 N × 5 m of work done?", a:"50 J", opts:["50 J","50 W","50 kg","50 N"] },
+        { q:"Which has more inertia — a truck or a bicycle?", a:"Truck", opts:["Truck","Bicycle","Both equal","Depends on speed"] },
+        { q:"Unit of velocity?", a:"m/s", opts:["m/s","m/s²","kg·m/s","J"] },
+      ],
+      medium: [
+        { q:"A car accelerates from 0 to 20 m/s in 4 s. Acceleration?", a:"5 m/s²", opts:["5 m/s²","80 m/s²","0.2 m/s²","4 m/s²"] },
+        { q:"Momentum = mass × ?", a:"velocity", opts:["velocity","acceleration","force","energy"] },
+        { q:"A 10 kg object moving at 4 m/s has momentum of?", a:"40 kg·m/s", opts:["40 kg·m/s","2.5 kg·m/s","14 kg·m/s","400 kg·m/s"] },
+        { q:"What is the formula for kinetic energy?", a:"½mv²", opts:["½mv²","mv","mgh","Fs"] },
+        { q:"A 5 kg box is lifted 3 m. GPE gained (g=10)?", a:"150 J", opts:["150 J","15 J","50 J","1500 J"] },
+        { q:"Power = Work ÷ ?", a:"Time", opts:["Time","Distance","Mass","Force"] },
+        { q:"Newton's second law: F = ?", a:"ma", opts:["ma","mv","½mv²","mgh"] },
+        { q:"If F=30 N and m=6 kg, acceleration =?", a:"5 m/s²", opts:["5 m/s²","0.2 m/s²","180 m/s²","24 m/s²"] },
+        { q:"A 2 kg ball falls freely for 3 s (g=10). Velocity =?", a:"30 m/s", opts:["30 m/s","15 m/s","60 m/s","6 m/s"] },
+        { q:"Unit of power?", a:"Watt", opts:["Watt","Joule","Newton","Pascal"] },
+      ],
+      hard: [
+        { q:"A rocket ejects gas at 1000 m/s, mass flow 10 kg/s. Thrust?", a:"10000 N", opts:["10000 N","1000 N","100 N","10 N"] },
+        { q:"Centripetal acceleration = v²/r. At v=6 m/s, r=9 m?", a:"4 m/s²", opts:["4 m/s²","0.67 m/s²","54 m/s²","3 m/s²"] },
+        { q:"Impulse = F × Δt. F=500 N for 0.02 s. Impulse?", a:"10 N·s", opts:["10 N·s","25 N·s","0.04 N·s","1000 N·s"] },
+        { q:"A 3 kg ball at 4 m/s collides perfectly inelastically with 1 kg at rest. Final velocity?", a:"3 m/s", opts:["3 m/s","4 m/s","1 m/s","12 m/s"] },
+        { q:"Escape velocity from Earth ≈?", a:"11.2 km/s", opts:["11.2 km/s","7.9 km/s","3 km/s","17 km/s"] },
+        { q:"Work done by friction on a 5 kg box sliding 4 m (μ=0.3, g=10)?", a:"-60 J", opts:["-60 J","60 J","-150 J","150 J"] },
+        { q:"A spring (k=200 N/m) compressed 0.1 m. PE stored?", a:"1 J", opts:["1 J","2 J","0.5 J","20 J"] },
+        { q:"Angular momentum L = Iω. I=2 kg·m², ω=3 rad/s. L=?", a:"6 kg·m²/s", opts:["6 kg·m²/s","1.5 kg·m²/s","9 kg·m²/s","0.67 kg·m²/s"] },
+      ]
+    },
+    electricity: {
+      easy: [
+        { q:"Unit of electric charge?", a:"Coulomb", opts:["Coulomb","Ampere","Volt","Ohm"] },
+        { q:"Ohm's Law: V = ?", a:"IR", opts:["IR","I/R","P/I","R/I"] },
+        { q:"Unit of resistance?", a:"Ohm (Ω)", opts:["Ohm (Ω)","Volt","Ampere","Watt"] },
+        { q:"What does a voltmeter measure?", a:"Voltage", opts:["Voltage","Current","Resistance","Power"] },
+        { q:"Conventional current flows from?", a:"+ to −", opts:["+ to −","− to +","Neither","Both directions"] },
+        { q:"In series circuits, current is?", a:"Same everywhere", opts:["Same everywhere","Different at each component","Zero","Doubled"] },
+      ],
+      medium: [
+        { q:"V=12 V, R=4 Ω. Current =?", a:"3 A", opts:["3 A","48 A","8 A","0.33 A"] },
+        { q:"Power P = V × ?", a:"I", opts:["I","R","V","F"] },
+        { q:"Two 6 Ω resistors in parallel. Combined resistance?", a:"3 Ω", opts:["3 Ω","12 Ω","6 Ω","1 Ω"] },
+        { q:"P=60 W, V=12 V. Current =?", a:"5 A", opts:["5 A","720 A","0.2 A","48 A"] },
+        { q:"Energy = Power × ?", a:"Time", opts:["Time","Voltage","Current","Resistance"] },
+        { q:"Two 4 Ω resistors in series. Total resistance?", a:"8 Ω", opts:["8 Ω","2 Ω","4 Ω","16 Ω"] },
+      ],
+      hard: [
+        { q:"Kirchhoff's voltage law states sum of EMFs = sum of?", a:"Voltage drops", opts:["Voltage drops","Currents","Resistances","Charges"] },
+        { q:"A capacitor C=100 μF charged to 20 V. Energy stored?", a:"0.02 J", opts:["0.02 J","2 J","0.2 J","200 J"] },
+        { q:"Internal resistance r=0.5 Ω, EMF=6 V, ext R=2.5 Ω. Terminal voltage?", a:"5 V", opts:["5 V","6 V","4 V","3 V"] },
+        { q:"Wheatstone bridge is used to measure?", a:"Unknown resistance", opts:["Unknown resistance","EMF","Current","Capacitance"] },
+      ]
+    },
+    waves: {
+      easy: [
+        { q:"Speed of light in vacuum ≈?", a:"3×10⁸ m/s", opts:["3×10⁸ m/s","3×10⁶ m/s","3×10¹⁰ m/s","3×10⁴ m/s"] },
+        { q:"What type of wave is sound?", a:"Longitudinal", opts:["Longitudinal","Transverse","Electromagnetic","Surface"] },
+        { q:"Frequency unit?", a:"Hertz (Hz)", opts:["Hertz (Hz)","Metre","Second","Watt"] },
+        { q:"Wave speed = frequency × ?", a:"Wavelength", opts:["Wavelength","Amplitude","Period","Phase"] },
+        { q:"Light bends when passing from air to glass. This is?", a:"Refraction", opts:["Refraction","Reflection","Diffraction","Dispersion"] },
+      ],
+      medium: [
+        { q:"A wave has f=400 Hz, λ=0.85 m. Speed?", a:"340 m/s", opts:["340 m/s","0.002 m/s","470 m/s","400 m/s"] },
+        { q:"Period T = 1/?", a:"f", opts:["f","λ","v","A"] },
+        { q:"Total internal reflection occurs when angle > ?", a:"Critical angle", opts:["Critical angle","Right angle","Brewster angle","Diffraction angle"] },
+        { q:"Doppler effect: source approaching → frequency?", a:"Increases", opts:["Increases","Decreases","Stays same","Doubles immediately"] },
+      ],
+      hard: [
+        { q:"Snell's law: n₁sin θ₁ = ?", a:"n₂sin θ₂", opts:["n₂sin θ₂","n₂cos θ₂","n₁sin θ₂","n₂/sin θ₂"] },
+        { q:"A standing wave has nodes and?", a:"Antinodes", opts:["Antinodes","Crests","Troughs","Peaks"] },
+        { q:"de Broglie wavelength λ = h/?", a:"p (momentum)", opts:["p (momentum)","m (mass)","v (velocity)","E (energy)"] },
+      ]
+    },
+    thermodynamics: {
+      easy: [
+        { q:"SI unit of temperature?", a:"Kelvin", opts:["Kelvin","Celsius","Fahrenheit","Rankine"] },
+        { q:"0°C in Kelvin?", a:"273 K", opts:["273 K","0 K","100 K","373 K"] },
+        { q:"Heat transfer through direct contact?", a:"Conduction", opts:["Conduction","Convection","Radiation","Induction"] },
+        { q:"Specific heat capacity unit?", a:"J/(kg·K)", opts:["J/(kg·K)","J/kg","W/m","kg/J"] },
+      ],
+      medium: [
+        { q:"1st Law of Thermodynamics: ΔU = Q – ?", a:"W", opts:["W","P","T","V"] },
+        { q:"Boyle's Law: P₁V₁ = P₂V₂ at constant ?", a:"Temperature", opts:["Temperature","Pressure","Volume","Mass"] },
+        { q:"Q=mcΔT. m=2 kg, c=4200, ΔT=5. Q=?", a:"42000 J", opts:["42000 J","4200 J","420 J","21000 J"] },
+        { q:"Entropy in an isolated system tends to?", a:"Increase", opts:["Increase","Decrease","Stay same","Oscillate"] },
+      ],
+      hard: [
+        { q:"Carnot efficiency = 1 – Tc/Th. Th=400K, Tc=300K. η=?", a:"25%", opts:["25%","75%","33%","50%"] },
+        { q:"2nd Law: heat cannot flow spontaneously from?", a:"Cold to hot", opts:["Cold to hot","Hot to cold","Gas to liquid","High to low pressure"] },
+        { q:"Ideal gas law: PV = ?", a:"nRT", opts:["nRT","mRT","PnT","nR/T"] },
+      ]
+    },
+  },
+  chemistry: {
+    atomic: {
+      easy: [
+        { q:"Who proposed the nuclear model of the atom?", a:"Rutherford", opts:["Rutherford","Bohr","Thomson","Dalton"] },
+        { q:"Number of protons in an atom defines its?", a:"Atomic number", opts:["Atomic number","Mass number","Valency","Period"] },
+        { q:"Electrons are found in the?", a:"Electron shells", opts:["Electron shells","Nucleus","Protons","Neutrons"] },
+        { q:"Which particle has no charge?", a:"Neutron", opts:["Neutron","Proton","Electron","Positron"] },
+        { q:"Mass number = protons + ?", a:"Neutrons", opts:["Neutrons","Electrons","Valence electrons","Isotopes"] },
+        { q:"Isotopes have the same atomic number but different?", a:"Mass number", opts:["Mass number","Atomic number","Protons","Period"] },
+      ],
+      medium: [
+        { q:"Carbon-14 has 6 protons. How many neutrons?", a:"8", opts:["8","6","14","2"] },
+        { q:"Quantum number that describes orbital shape?", a:"Azimuthal (l)", opts:["Azimuthal (l)","Principal (n)","Magnetic (m)","Spin (s)"] },
+        { q:"Maximum electrons in 3rd shell?", a:"18", opts:["18","8","2","32"] },
+        { q:"Hund's rule states electrons occupy orbitals?", a:"Singly before pairing", opts:["Singly before pairing","In pairs first","Randomly","By mass"] },
+        { q:"An atom with more electrons than protons is a?", a:"Negative ion (anion)", opts:["Negative ion (anion)","Positive ion (cation)","Isotope","Neutral atom"] },
+      ],
+      hard: [
+        { q:"Heisenberg uncertainty principle: Δx·Δp ≥ ?", a:"ħ/2", opts:["ħ/2","h","ħ","2ħ"] },
+        { q:"Electronic config of Fe (Z=26)?", a:"[Ar] 3d⁶ 4s²", opts:["[Ar] 3d⁶ 4s²","[Ar] 3d⁸","[Ne] 3d⁶ 4s²","[Ar] 3d⁵ 4s³"] },
+        { q:"Aufbau principle fills orbitals in order of increasing?", a:"Energy", opts:["Energy","Atomic number","Electron count","Principal quantum number"] },
+      ]
+    },
+    periodic: {
+      easy: [
+        { q:"Symbol for Gold?", a:"Au", opts:["Au","Go","Gd","Ag"] },
+        { q:"Symbol for Iron?", a:"Fe", opts:["Fe","Ir","In","Fr"] },
+        { q:"Symbol for Sodium?", a:"Na", opts:["Na","So","Sd","N"] },
+        { q:"Noble gases are in group?", a:"18 (VIII A)", opts:["18 (VIII A)","1","17","16"] },
+        { q:"Atomic number of Carbon?", a:"6", opts:["6","12","4","8"] },
+        { q:"Which element has symbol K?", a:"Potassium", opts:["Potassium","Krypton","Calcium","Cobalt"] },
+        { q:"Halogen group number?", a:"17", opts:["17","1","18","7"] },
+        { q:"Symbol for Chlorine?", a:"Cl", opts:["Cl","Ch","Cn","C"] },
+        { q:"Lightest element?", a:"Hydrogen", opts:["Hydrogen","Helium","Lithium","Carbon"] },
+        { q:"Symbol for Silver?", a:"Ag", opts:["Ag","Si","Sv","S"] },
+      ],
+      medium: [
+        { q:"Electronegativity increases across a period in which direction?", a:"Left to right", opts:["Left to right","Right to left","Top to bottom","Bottom to top"] },
+        { q:"Which has the largest atomic radius — Li, Na, or K?", a:"K", opts:["K","Na","Li","All equal"] },
+        { q:"Elements in the same group have the same number of?", a:"Valence electrons", opts:["Valence electrons","Protons","Neutrons","Energy levels"] },
+        { q:"Transition metals are in which block?", a:"d-block", opts:["d-block","s-block","p-block","f-block"] },
+        { q:"First ionisation energy trend across a period?", a:"Generally increases", opts:["Generally increases","Decreases","Stays same","Random"] },
+        { q:"Lanthanides and actinides are in which block?", a:"f-block", opts:["f-block","d-block","p-block","s-block"] },
+      ],
+      hard: [
+        { q:"Anomalous configuration of Cr (Z=24)?", a:"[Ar] 3d⁵ 4s¹", opts:["[Ar] 3d⁵ 4s¹","[Ar] 3d⁴ 4s²","[Ar] 3d⁶","[Ar] 3d⁵ 4s²"] },
+        { q:"Periodic law: properties repeat periodically with increasing?", a:"Atomic number", opts:["Atomic number","Atomic mass","Electron shells","Neutrons"] },
+        { q:"Second ionisation energy is always _____ than the first?", a:"Higher", opts:["Higher","Lower","Equal","Unpredictable"] },
+      ]
+    },
+    bonding: {
+      easy: [
+        { q:"Ionic bond forms between?", a:"Metal and non-metal", opts:["Metal and non-metal","Two non-metals","Two metals","Non-metal and gas"] },
+        { q:"Covalent bond shares?", a:"Electrons", opts:["Electrons","Protons","Neutrons","Ions"] },
+        { q:"NaCl is an example of?", a:"Ionic compound", opts:["Ionic compound","Covalent molecule","Metallic bond","Hydrogen bond"] },
+        { q:"Water (H₂O) bonds are?", a:"Covalent", opts:["Covalent","Ionic","Metallic","Van der Waals"] },
+        { q:"Metallic bonds involve a sea of?", a:"Electrons", opts:["Electrons","Protons","Neutrons","Ions"] },
+      ],
+      medium: [
+        { q:"VSEPR: CH₄ molecular geometry?", a:"Tetrahedral", opts:["Tetrahedral","Trigonal planar","Linear","Bent"] },
+        { q:"CO₂ molecular geometry?", a:"Linear", opts:["Linear","Bent","Tetrahedral","Trigonal"] },
+        { q:"Hybridisation of carbon in CH₄?", a:"sp³", opts:["sp³","sp²","sp","sp³d"] },
+        { q:"Strongest intermolecular force?", a:"Hydrogen bonding", opts:["Hydrogen bonding","Van der Waals","Dipole-dipole","Ionic interactions"] },
+        { q:"Bond order of N₂?", a:"3 (triple bond)", opts:["3 (triple bond)","2 (double)","1 (single)","4"] },
+      ],
+      hard: [
+        { q:"MO theory: O₂ is?", a:"Paramagnetic", opts:["Paramagnetic","Diamagnetic","Ionic","Non-polar"] },
+        { q:"VSEPR shape of SF₆?", a:"Octahedral", opts:["Octahedral","Tetrahedral","Trigonal bipyramidal","Square planar"] },
+        { q:"Lattice energy of NaCl is approximately?", a:"−787 kJ/mol", opts:["−787 kJ/mol","−411 kJ/mol","−100 kJ/mol","−1500 kJ/mol"] },
+      ]
+    },
+    reactions: {
+      easy: [
+        { q:"Acid + Base → Salt + ?", a:"Water", opts:["Water","Carbon dioxide","Oxygen","Hydrogen"] },
+        { q:"Combustion of hydrocarbons produces CO₂ and?", a:"H₂O", opts:["H₂O","H₂","O₂","NO₂"] },
+        { q:"Oxidation involves loss of?", a:"Electrons", opts:["Electrons","Protons","Neutrons","Mass"] },
+        { q:"pH of a neutral solution?", a:"7", opts:["7","0","14","1"] },
+        { q:"Catalyst _____ activation energy?", a:"Lowers", opts:["Lowers","Raises","Has no effect on","Doubles"] },
+        { q:"Exothermic reaction releases?", a:"Heat", opts:["Heat","Cold","Light only","Sound only"] },
+      ],
+      medium: [
+        { q:"Rate law for 2A + B → C: rate = k[A]²[B]. Doubling [A] changes rate by?", a:"4×", opts:["4×","2×","8×","1×"] },
+        { q:"Equilibrium constant Kc = products/reactants. Kc > 1 means?", a:"Products favoured", opts:["Products favoured","Reactants favoured","No reaction","50-50"] },
+        { q:"Le Chatelier: increasing pressure shifts equilibrium towards?", a:"Fewer moles of gas", opts:["Fewer moles of gas","More moles of gas","Reactants always","Products always"] },
+        { q:"ΔG = ΔH − TΔS. Reaction is spontaneous when ΔG is?", a:"Negative", opts:["Negative","Positive","Zero","Infinite"] },
+        { q:"Half-life of radioactive decay is?", a:"Time for half to decay", opts:["Time for half to decay","Total decay time","Rate constant","Activation energy"] },
+      ],
+      hard: [
+        { q:"Arrhenius equation: k = Ae^(−Ea/RT). Ea is?", a:"Activation energy", opts:["Activation energy","Enthalpy","Entropy","Bond energy"] },
+        { q:"SN2 reaction proceeds with?", a:"Inversion of configuration", opts:["Inversion of configuration","Retention","Racemisation","No stereo change"] },
+        { q:"Henderson–Hasselbalch: pH = pKa + log([A⁻]/[HA]). Buffer at pH=pKa when?", a:"[A⁻]=[HA]", opts:["[A⁻]=[HA]","[A⁻]>[HA]","[HA]>[A⁻]","pH=14"] },
+      ]
+    },
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let currentSubject = 'physics';
+let currentDiff    = 'easy';
+let activeTopics   = [];
+let timerEnabled   = true;
+let livesEnabled   = true;
+let hintEnabled    = true;
+let totalQuestions = 10;
+let timePerQ       = 45;
+let mixMode        = false;
+
+let score=0, streak=0, bestStreak=0;
+let xp=0, xpLevel=1, totalXPSession=0;
+let currentQuestion=0;
+let timeLeft=45, totalTimeForQ=45;
+let timerInterval=null;
+let gamePaused=false;
+let lives=3;
+let hintUsed=false;
+let totalAnswered=0, totalCorrect=0;
+let answeredQuestions=[];
+let currentAnswer='';
+let currentType='';
+let questionStartTime=0;
+let soundEnabled=true;
+let topicStats={};
+const seenQuestions=new Set();
+
+const XP_PER_CORRECT=15;
+const XP_PER_LEVEL=100;
+const KB_LABELS=['A','B','C','D'];
+
+// ══════════════════════════════════════════════════════
+//  DOM REFS
+// ══════════════════════════════════════════════════════
+const startScreen  = document.getElementById('startScreen');
+const gameScreen   = document.getElementById('gameScreen');
+const endScreen    = document.getElementById('endScreen');
+const scoreEl      = document.getElementById('scoreEl');
+const streakEl     = document.getElementById('streakEl');
+const accuracyEl   = document.getElementById('accuracyEl');
+const qNumEl       = document.getElementById('qNumEl');
+const timerBarWrap = document.getElementById('timerBarWrap');
+const timerBarFill = document.getElementById('timerBarFill');
+const qText        = document.getElementById('qText');
+const qTypeBadge   = document.getElementById('qTypeBadge');
+const subjectBadge = document.getElementById('subjectBadge');
+const choicesGrid  = document.getElementById('choicesGrid');
+const feedbackEl   = document.getElementById('feedbackEl');
+const qCard        = document.getElementById('qCard');
+const hintBtn      = document.getElementById('hintBtn');
+const skipBtn      = document.getElementById('skipBtn');
+const pauseBtn     = document.getElementById('pauseBtn');
+const pauseOverlay = document.getElementById('pauseOverlay');
+const flashOverlay = document.getElementById('flashOverlay');
+const comboBanner  = document.getElementById('comboBanner');
+const comboText    = document.getElementById('comboText');
+const comboMult    = document.getElementById('comboMult');
+const xpLabel      = document.getElementById('xpLabel');
+const xpBarFill    = document.getElementById('xpBarFill');
+const xpNext       = document.getElementById('xpNext');
+const levelupToast = document.getElementById('levelupToast');
+const speedToast   = document.getElementById('speedToast');
+
+// ══════════════════════════════════════════════════════
+//  TOPIC BUILDER
+// ══════════════════════════════════════════════════════
+const TOPIC_LABELS = {
+  physics: { mechanics:'⚙️ Mechanics', electricity:'⚡ Electricity', waves:'🌊 Waves', thermodynamics:'🌡 Thermodynamics' },
+  chemistry: { atomic:'⚛️ Atomic Structure', periodic:'📊 Periodic Table', bonding:'🔗 Bonding', reactions:'🧪 Reactions' }
+};
+
+function buildTopicPills(subj){
+  const wrap = document.getElementById('topicWrap');
+  const labels = TOPIC_LABELS[subj];
+  wrap.innerHTML = '';
+  activeTopics = Object.keys(labels);
+  Object.entries(labels).forEach(([key, label])=>{
+    const pill = document.createElement('button');
+    pill.className='topic-pill active';
+    pill.dataset.topic=key;
+    pill.textContent=label;
+    pill.addEventListener('click',()=>{
+      pill.classList.toggle('active');
+      activeTopics = [...wrap.querySelectorAll('.topic-pill.active')].map(p=>p.dataset.topic);
+      if(activeTopics.length===0){ pill.classList.add('active'); activeTopics=[key]; }
+    });
+    wrap.appendChild(pill);
+  });
+  document.getElementById('topicSubjLabel').textContent = subj==='physics'?'Physics':'Chemistry';
+}
+buildTopicPills('physics');
+
+document.querySelectorAll('.subj-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.subj-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSubject=btn.dataset.subj;
+    buildTopicPills(currentSubject);
+  });
+});
+
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiff=btn.dataset.diff;
+  });
+});
+
+// ══════════════════════════════════════════════════════
+//  QUESTION PICKER
+// ══════════════════════════════════════════════════════
+function pickQuestion(){
+  let subj = currentSubject;
+  if(mixMode) subj = Math.random()<0.5?'physics':'chemistry';
+
+  const topics = activeTopics.filter(t=>QB[subj][t]);
+  if(!topics.length) return null;
+  const topic = topics[Math.floor(Math.random()*topics.length)];
+  const pool = (QB[subj][topic][currentDiff]||QB[subj][topic]['easy']);
+  if(!pool||!pool.length) return null;
+
+  // Filter out seen questions
+  const unseen = pool.filter(q=>!seenQuestions.has(q.q));
+  const src = unseen.length>0 ? unseen : pool; // fallback if all seen
+  const q = src[Math.floor(Math.random()*src.length)];
+  seenQuestions.add(q.q);
+  currentType = topic;
+  return { ...q, subj };
+}
+
+// ══════════════════════════════════════════════════════
+//  GENERATE QUESTION
+// ══════════════════════════════════════════════════════
+function generateQuestion(){
+  const item = pickQuestion();
+  if(!item){ endGame(); return; }
+
+  currentAnswer = item.a;
+  qText.className='q-text';
+  qText.textContent = item.q;
+  requestAnimationFrame(()=>{ qText.className='q-text slide-in'; });
+
+  const subj = item.subj||currentSubject;
+  const topicLabel = TOPIC_LABELS[subj]?.[currentType] || currentType;
+  qTypeBadge.textContent = topicLabel.replace(/^[^\w]*/,'').trim();
+  subjectBadge.textContent = subj==='physics'?'⚡ Physics':'🧪 Chemistry';
+  subjectBadge.className = 'subject-badge ' + subj.substring(0,4);
+
+  // Build shuffled MCQ options
+  const opts = shuffle([...item.opts]);
+  choicesGrid.innerHTML='';
+  opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.innerHTML=`<span class="kbd-hint">${KB_LABELS[i]}</span>${opt}`;
+    btn.addEventListener('click',()=>processAnswer(opt));
+    choicesGrid.appendChild(btn);
+  });
+
+  feedbackEl.className='feedback hidden';
+  currentQuestion++;
+  qNumEl.textContent=`${currentQuestion}/${totalQuestions}`;
+  questionStartTime=Date.now();
+
+  clearHint();
+  hintUsed=false;
+  if(hintEnabled){ hintBtn.disabled=false; hintBtn.style.opacity='1'; }
+  else { hintBtn.disabled=true; hintBtn.style.opacity='0.4'; }
+}
+
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+// ══════════════════════════════════════════════════════
+//  PROCESS ANSWER
+// ══════════════════════════════════════════════════════
+function processAnswer(userAnswer){
+  const isCorrect = userAnswer===currentAnswer;
+  const timeBonus  = (Date.now()-questionStartTime)<5000 && isCorrect;
+  choicesGrid.querySelectorAll('.choice-btn').forEach(b=>{
+    const txt=b.textContent.trim().replace(/^[ABCD]/,'').trim();
+    if(txt===currentAnswer) b.classList.add('correct');
+    else if(txt===userAnswer && !isCorrect) b.classList.add('wrong');
+    b.style.pointerEvents='none';
+  });
+  if(!topicStats[currentType]) topicStats[currentType]={correct:0,total:0};
+  topicStats[currentType].total++;
+  if(isCorrect){
+    topicStats[currentType].correct++;
+    streak++;bestStreak=Math.max(bestStreak,streak);totalCorrect++;
+    const mult=getComboMult();
+    score+=10*mult+(timeBonus?5:0);
+    scoreEl.textContent=score;
+    streakEl.textContent=streak;
+    updateComboBanner();
+    addXP(XP_PER_CORRECT);
+    playBeep(880,0.2,'sine');
+    setTimeout(()=>playBeep(1100,0.15,'sine'),100);
+    if(streak>=3){setTimeout(()=>playBeep(660,0.1,'sine'),0);setTimeout(()=>playBeep(880,0.1,'sine'),80);}
+    spawnConfetti();createFlash(true);
+    let fbHtml=`<span>✓ Correct!</span>`;
+    if(mult>1)fbHtml+=` <span style="color:var(--gold);font-size:12px">×${mult} combo</span>`;
+    if(timeBonus)fbHtml+=` <span style="color:var(--accent2);font-size:11px">⚡ Speed!</span>`;
+    showFeedback(true,fbHtml);
+  } else {
+    streak=0;streakEl.textContent=0;updateComboBanner();
+    if(livesEnabled) loseLife();
+    playBeep(300,0.3,'sawtooth');
+    createFlash(false);shakeCard();
+    showFeedback(false,`✗ Correct: <b>${currentAnswer}</b>`);
+    if(lives<=0 && livesEnabled){
+      totalAnswered++;updateAccuracy();
+      setTimeout(()=>endGame(),1100);return;
+    }
+  }
+  totalAnswered++;updateAccuracy();
+  setTimeout(()=>{
+    feedbackEl.className='feedback hidden';
+    if(currentQuestion>=totalQuestions){endGame();return;}
+    generateQuestion();
+    if(timerEnabled){clearInterval(timerInterval);timeLeft=totalTimeForQ;updateTimerBar();startTimer();}
+  },1100);
+}
+
+// ══════════════════════════════════════════════════════
+//  COMBO / XP / ACCURACY
+// ══════════════════════════════════════════════════════
+function getComboMult(){ return streak>=10?4:streak>=6?3:streak>=3?2:1; }
+function updateComboBanner(){
+  const mult=getComboMult();
+  if(streak>=3){
+    comboBanner.classList.add('visible');
+    comboText.textContent=streak>=10?'LEGENDARY!':streak>=6?'On fire!':'Combo!';
+    comboMult.textContent=`×${mult}`;
+  } else { comboBanner.classList.remove('visible'); }
+}
+function addXP(amount){
+  xp+=amount;totalXPSession+=amount;
+  const needed=xpLevel*XP_PER_LEVEL;
+  if(xp>=needed){xp-=needed;xpLevel++;showToast(`⬆ Level ${xpLevel}!`);}
+  updateXPBar();
+}
+function updateXPBar(){
+  const needed=xpLevel*XP_PER_LEVEL;
+  xpLabel.textContent=`Lv ${xpLevel}`;
+  xpBarFill.style.width=Math.min(100,(xp/needed)*100)+'%';
+  xpNext.textContent=`${xp}/${needed} XP`;
+}
+function updateAccuracy(){
+  accuracyEl.textContent=totalAnswered>0?Math.round((totalCorrect/totalAnswered)*100)+'%':'—';
+}
+
+// ══════════════════════════════════════════════════════
+//  TIMER
+// ══════════════════════════════════════════════════════
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timeLeft--;updateTimerBar();
+    if(timeLeft<=0){clearInterval(timerInterval);processAnswer('__TIMEOUT__');}
+  },1000);
+}
+function updateTimerBar(){
+  if(!timerEnabled){timerBarWrap.style.display='none';return;}
+  timerBarWrap.style.display='block';
+  const pct=Math.max(0,(timeLeft/totalTimeForQ)*100);
+  timerBarFill.style.width=pct+'%';
+  timerBarFill.className='timer-bar-fill';
+  const cd=document.getElementById('timerCountdown');
+  cd.className='timer-countdown';
+  if(pct<30){timerBarFill.classList.add('danger');cd.classList.add('danger');}
+  else if(pct<55){timerBarFill.classList.add('warn');cd.classList.add('warn');}
+  cd.textContent=timeLeft;
+}
+
+// ══════════════════════════════════════════════════════
+//  LIVES
+// ══════════════════════════════════════════════════════
+function renderLives(){
+  ['h1','h2','h3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('lost',i>=lives);
+  });
+}
+function loseLife(){
+  if(!livesEnabled||lives<=0)return;
+  const el=document.getElementById('h'+lives);
+  if(el){el.classList.add('losing');setTimeout(()=>{el.classList.remove('losing');el.classList.add('lost');},420);}
+  lives--;
+}
+
+// ══════════════════════════════════════════════════════
+//  HINT
+// ══════════════════════════════════════════════════════
+function clearHint(){ const h=document.getElementById('activeHint'); if(h) h.remove(); }
+function showHint(){
+  if(hintUsed||!hintEnabled)return;
+  clearHint();
+  const box=document.createElement('div');
+  box.className='hint-box';box.id='activeHint';
+  box.innerHTML=`💡 <strong>Hint:</strong> The answer starts with "<b>${String(currentAnswer).charAt(0)}</b>". It has ${String(currentAnswer).length} character(s).`;
+  qCard.appendChild(box);
+  hintUsed=true;hintBtn.disabled=true;hintBtn.style.opacity='0.4';
+  playBeep(700,0.1,'sine');
+}
+
+// ══════════════════════════════════════════════════════
+//  SKIP
+// ══════════════════════════════════════════════════════
+function skipQuestion(){
+  answeredQuestions.push({question:qText.textContent,userAnswer:'Skipped',correctAnswer:currentAnswer,isCorrect:false});
+  streak=0;streakEl.textContent=0;updateComboBanner();
+  totalAnswered++;updateAccuracy();clearHint();
+  clearInterval(timerInterval);
+  if(currentQuestion>=totalQuestions){endGame();return;}
+  hintUsed=false;
+  generateQuestion();
+  if(timerEnabled){timeLeft=totalTimeForQ;updateTimerBar();startTimer();}
+}
+
+// ══════════════════════════════════════════════════════
+//  FEEDBACK / FLASH / SHAKE / CONFETTI
+// ══════════════════════════════════════════════════════
+function showFeedback(ok,html){
+  feedbackEl.className='feedback show '+(ok?'correct':'wrong');
+  feedbackEl.innerHTML=html;feedbackEl.classList.remove('hidden');
+}
+function createFlash(ok){
+  flashOverlay.className='flash-overlay '+(ok?'correct':'wrong');
+  setTimeout(()=>flashOverlay.className='flash-overlay',500);
+}
+function shakeCard(){
+  qCard.classList.add('shaking');
+  setTimeout(()=>qCard.classList.remove('shaking'),350);
+}
+function spawnConfetti(){
+  const emojis=['⭐','✨','🌟','💫','🎊','🔬','⚗️','⚡'];
+  for(let i=0;i<8;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText=`left:${20+Math.random()*60}%;top:${20+Math.random()*40}%;animation:cffall ${0.8+Math.random()*0.6}s ease-out ${Math.random()*0.3}s forwards;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1500);
+  }
+}
+function showToast(msg){
+  levelupToast.textContent=msg;levelupToast.classList.add('show');
+  setTimeout(()=>levelupToast.classList.remove('show'),2200);
+}
+
+// ══════════════════════════════════════════════════════
+//  SOUND
+// ══════════════════════════════════════════════════════
+let audioCtx=null;
+function getAudio(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function playBeep(freq,vol=0.2,type='sine',dur=0.15){
+  if(!soundEnabled)return;
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.start(ctx.currentTime);o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════════════════
+//  START / END GAME
+// ══════════════════════════════════════════════════════
+document.getElementById('startBtn').addEventListener('click',()=>{
+  timerEnabled=document.getElementById('timerToggle').checked;
+  livesEnabled=document.getElementById('livesToggle').checked;
+  hintEnabled=document.getElementById('hintToggle').checked;
+  totalQuestions=parseInt(document.getElementById('qCountSel').value);
+  timePerQ=parseInt(document.getElementById('timeSel').value);
+  mixMode=document.getElementById('mixToggle').checked;
+  totalTimeForQ=timePerQ;timeLeft=timePerQ;
+
+  if(mixMode){
+    // enable all topics for both
+    activeTopics=[...Object.keys(TOPIC_LABELS.physics),...Object.keys(TOPIC_LABELS.chemistry)];
+  }
+
+  score=0;streak=0;bestStreak=0;xp=0;xpLevel=1;totalXPSession=0;
+  currentQuestion=0;totalAnswered=0;totalCorrect=0;
+  answeredQuestions=[];lives=3;hintUsed=false;gamePaused=false;
+  seenQuestions.clear();topicStats={};
+
+  document.getElementById('livesRow').style.display=livesEnabled?'flex':'none';
+  renderLives();updateXPBar();updateAccuracy();
+  scoreEl.textContent='0';streakEl.textContent='0';
+
+  startScreen.style.display='none';
+  endScreen.style.display='none';
+  gameScreen.style.display='block';
+
+  generateQuestion();
+  if(timerEnabled){updateTimerBar();startTimer();}
+  else{timerBarWrap.style.display='none';}
+});
+
+function endGame(){
+  clearInterval(timerInterval);
+  gameScreen.style.display='none';
+  endScreen.style.display='block';
+
+  const acc=totalAnswered>0?Math.round((totalCorrect/totalAnswered)*100):0;
+  document.getElementById('endScore').textContent=score;
+  document.getElementById('endAccuracy').textContent=acc+'%';
+  document.getElementById('endBestStreak').textContent=bestStreak;
+  document.getElementById('endXP').textContent='+'+totalXPSession;
+  document.getElementById('endEmoji').textContent=acc>=90?'🏆':acc>=70?'🎉':acc>=50?'👍':'💪';
+  document.getElementById('endMsg').textContent=acc>=90?'Outstanding! Top of the class!':acc>=70?'Great work! Keep it up!':acc>=50?'Good effort! Review the topics!':'Keep practising — science takes time!';
+
+  renderLeaderboard(score,acc);
+  renderReview();
+  renderTopicChart();
+}
+
+function renderLeaderboard(score,acc){
+  const key='sbLB_'+currentSubject;
+  let lb=JSON.parse(localStorage.getItem(key)||'[]');
+  lb.push({score,acc,diff:currentDiff,date:new Date().toLocaleDateString()});
+  lb.sort((a,b)=>b.score-a.score);lb=lb.slice(0,10);
+  localStorage.setItem(key,JSON.stringify(lb));
+  const list=document.getElementById('lbList');
+  list.innerHTML='';
+  lb.slice(0,5).forEach((r,i)=>{
+    const isYou=i===lb.findIndex(x=>x.score===score&&x.date===new Date().toLocaleDateString());
+    const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+    const row=document.createElement('div');
+    row.className='lb-row'+(isYou?' lb-you':'');
+    row.innerHTML=`<span class="lb-rank">${medals[i]||i+1}</span><span class="lb-info">${r.diff} · ${r.date}</span><span class="lb-score">${r.score}</span><span class="lb-pct">${r.acc}%</span>`;
+    list.appendChild(row);
+  });
+  if(!lb.length) list.innerHTML='<div style="color:var(--text3);font-size:13px;padding:8px">No scores yet</div>';
+}
+
+function renderReview(){
+  const wrap=document.getElementById('reviewWrap');
+  wrap.innerHTML='';
+  answeredQuestions.slice(-15).reverse().forEach(q=>{
+    const d=document.createElement('div');
+    d.className='rv-item '+(q.isCorrect?'rv-correct':'rv-wrong');
+    d.innerHTML=`<div class="rv-q">${q.question}</div><div class="rv-a">Your answer: ${q.userAnswer} · Correct: ${q.correctAnswer}</div>`;
+    wrap.appendChild(d);
+  });
+}
+
+function renderTopicChart(){
+  const el=document.getElementById('topicChart');
+  const entries=Object.entries(topicStats).filter(([,v])=>v.total>0);
+  if(entries.length<2){el.innerHTML='';return;}
+  const labels={...TOPIC_LABELS.physics,...TOPIC_LABELS.chemistry};
+  el.innerHTML=`<div class="topic-chart-title">📊 Topic Breakdown</div>`+
+    entries.map(([t,v])=>{
+      const pct=Math.round((v.correct/v.total)*100);
+      const cls=pct>=80?'perfect':pct<40?'bad':'';
+      const label=(labels[t]||t).replace(/^[^\w]*/,'').trim();
+      return `<div class="tc-row"><div class="tc-label">${label}</div><div class="tc-bar-wrap"><div class="tc-bar ${cls}" style="width:${pct}%"></div></div><div class="tc-pct">${pct}%</div></div>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  PAUSE
+// ══════════════════════════════════════════════════════
+pauseBtn.addEventListener('click',()=>{
+  gamePaused=true;clearInterval(timerInterval);
+  pauseOverlay.classList.add('show');
+});
+document.getElementById('resumeBtn').addEventListener('click',()=>{
+  gamePaused=false;pauseOverlay.classList.remove('show');
+  if(timerEnabled)startTimer();
+});
+document.getElementById('quitBtn').addEventListener('click',()=>{
+  clearInterval(timerInterval);pauseOverlay.classList.remove('show');
+  gameScreen.style.display='none';
+  endGame();
+});
+document.getElementById('playAgainBtn').addEventListener('click',()=>{
+  endScreen.style.display='none';startScreen.style.display='block';
+});
+hintBtn.addEventListener('click',showHint);
+skipBtn.addEventListener('click',skipQuestion);
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if(gameScreen.style.display==='none')return;
+  if(e.key==='1'||e.key==='a')choicesGrid.querySelectorAll('.choice-btn')[0]?.click();
+  if(e.key==='2'||e.key==='b')choicesGrid.querySelectorAll('.choice-btn')[1]?.click();
+  if(e.key==='3'||e.key==='c')choicesGrid.querySelectorAll('.choice-btn')[2]?.click();
+  if(e.key==='4'||e.key==='d')choicesGrid.querySelectorAll('.choice-btn')[3]?.click();
+  if(e.key==='h'||e.key==='H')hintBtn.click();
+  if(e.key==='s'||e.key==='S')skipBtn.click();
+  if(e.key==='Escape')pauseBtn.click();
+});
+
+// Theme toggle
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+  document.getElementById('themeBtn').textContent=document.body.classList.contains('light')?'🌙':'☀️';
+});
+// Sound toggle
+document.getElementById('sfxBtn').addEventListener('click',()=>{
+  soundEnabled=!soundEnabled;
+  document.getElementById('sfxBtn').textContent=soundEnabled?'🔊':'🔇';
+});
+</script>
+</body>
+</html>
