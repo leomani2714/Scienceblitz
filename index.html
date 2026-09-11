@@ -1413,6 +1413,45 @@
       margin-top: 6px;
     }
 
+    .multi-result {
+      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .multi-result-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+
+    .multi-result-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--accent2);
+    }
+
+    .multi-result-message {
+      color: var(--text2);
+      font-size: 13px;
+      margin: 4px 0 16px;
+    }
+
+    .multi-result .multi-players {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .multi-result .ctrl-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
     @media (max-width: 520px) {
       .multi-fields {
         grid-template-columns: 1fr;
@@ -1593,6 +1632,13 @@
           <div id="multiChoices"></div>
           <div class="multi-status" id="multiAnswerStatus"></div>
         </div>
+        <div class="multi-result" id="multiResult" style="display:none">
+          <div class="multi-result-title">Round complete</div>
+          <div class="multi-result-score" id="multiResultScore">0 pts</div>
+          <div class="multi-result-message" id="multiResultMessage">Final standings</div>
+          <div class="multi-players" id="multiResultPlayers"></div>
+          <button class="ctrl-btn" id="multiResultLobbyBtn">Back to room</button>
+        </div>
       </div>
     </div>
 
@@ -1716,7 +1762,7 @@
   </div>
   <div class="flash-overlay" id="flashOverlay"></div>
   <div class="levelup-toast" id="levelupToast">⬆ Level Up!</div>
-  <div class="speed-toast" id="speedToast">⚡ Speed Bonus!</div>
+  <!-- <div class="speed-toast" id="speedToast">⚡ Speed Bonus!</div> -->
 
   <script>
     // ══════════════════════════════════════════════════════
@@ -2269,6 +2315,8 @@
     const multiRoomCode = document.getElementById('multiRoomCode');
     const multiPlayers = document.getElementById('multiPlayers');
     const multiQuestion = document.getElementById('multiQuestion');
+    const multiResult = document.getElementById('multiResult');
+    const multiResultPlayers = document.getElementById('multiResultPlayers');
     let multiplayerSocket = null;
     let multiplayerId = null;
     let multiplayerRoom = null;
@@ -2310,8 +2358,8 @@
         }
         if (message.type === 'game-over') {
           multiQuestion.style.display = 'none';
-          showMultiplayerStatus('Game over. Start another round from the host.');
-          renderMultiplayerPlayers(message.players);
+          multiResult.style.display = 'block';
+          renderMultiplayerResult(message.players);
         }
       });
       multiplayerSocket.addEventListener('close', () => {
@@ -2323,6 +2371,7 @@
 
     function renderMultiplayerRoom(state) {
       multiRoomCode.textContent = `ROOM ${state.roomCode}`;
+      multiResult.style.display = 'none';
       renderMultiplayerPlayers(state.players);
       const hostStartBtn = document.getElementById('hostStartBtn');
       hostStartBtn.style.display = state.hostId === multiplayerId ? 'block' : 'none';
@@ -2331,6 +2380,18 @@
 
     function renderMultiplayerPlayers(players) {
       multiPlayers.innerHTML = players.map(player => `<div class="multi-player"><span>${player.name}${player.id === multiplayerId ? ' (you)' : ''}</span><strong>${player.score} pts${player.answered ? ' · answered' : ''}</strong></div>`).join('');
+    }
+
+    function renderMultiplayerResult(players) {
+      const standings = [...players].sort((a, b) => b.score - a.score);
+      const player = standings.find(item => item.id === multiplayerId);
+      const rank = player ? standings.findIndex(item => item.id === multiplayerId) + 1 : 0;
+      document.getElementById('multiResultScore').textContent = `${player?.score || 0} pts`;
+      document.getElementById('multiResultMessage').textContent = rank === 1
+        ? 'You finished 1st. Excellent work!'
+        : `You finished ${rank}${rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'}. Keep practising!`;
+      multiResultPlayers.innerHTML = standings.map((item, index) => `<div class="multi-player${item.id === multiplayerId ? ' lb-you' : ''}"><span>${['🥇', '🥈', '🥉'][index] || `${index + 1}.`} ${item.name}${item.id === multiplayerId ? ' (you)' : ''}</span><strong>${item.score} pts</strong></div>`).join('');
+      showMultiplayerStatus('The round is complete.');
     }
 
     function renderMultiplayerQuestion(message) {
@@ -2360,6 +2421,11 @@
     });
     document.getElementById('createRoomBtn').addEventListener('click', () => connectMultiplayer('create-room'));
     document.getElementById('joinRoomBtn').addEventListener('click', () => connectMultiplayer('join-room'));
+    document.getElementById('multiResultLobbyBtn').addEventListener('click', () => {
+      multiResult.style.display = 'none';
+      multiQuestion.style.display = 'none';
+      showMultiplayerStatus('Waiting for the host to start another round.');
+    });
     document.getElementById('hostStartBtn').addEventListener('click', () => {
       multiplayerSend('start-game', {
         settings: {
