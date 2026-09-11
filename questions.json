@@ -3299,8 +3299,8 @@
                     ]
                 },
                 {
-                    "q": "Wave speed = frequency Ã— ?",
-                    "a": "Wavelength",
+                    "q": "Snell's law: n₁ sin θ₁ = ?",
+                    "a": "n₂ sin θ₂",
                     "opts": [
                         "Wavelength",
                         "Amplitude",
