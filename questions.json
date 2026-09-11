@@ -7231,23 +7231,23 @@
             ],
             "hard": [
                 {
-                    "q": "Heisenberg uncertainty principle: Î”xÂ·Î”p â‰¥ ?",
-                    "a": "Ä§/2",
+                    "q": "Heisenberg uncertainty principle: Δx·Δp ≥ ?",
+                    "a": "ℏ/2",
                     "opts": [
-                        "Ä§/2",
+                        "ℏ/2",
                         "h",
-                        "Ä§",
-                        "2Ä§"
+                        "ℏ",
+                        "2ℏ"
                     ]
                 },
                 {
-                    "q": "Electronic config of Fe (Z=26)?",
-                    "a": "[Ar] 3dâ¶ 4sÂ²",
+                    "q": "Electronic configuration of Fe (Z = 26)?",
+                    "a": "[Ar] 3d⁶ 4s²",
                     "opts": [
-                        "[Ar] 3dâ¶ 4sÂ²",
-                        "[Ar] 3dâ¸",
-                        "[Ne] 3dâ¶ 4sÂ²",
-                        "[Ar] 3dâµ 4sÂ³"
+                        "[Ar] 3d⁶ 4s²",
+                        "[Ar] 3d⁸",
+                        "[Ne] 3d⁶ 4s²",
+                        "[Ar] 3d⁵ 4s³"
                     ]
                 },
                 {
@@ -8649,13 +8649,13 @@
             ],
             "hard": [
                 {
-                    "q": "Anomalous configuration of Cr (Z=24)?",
-                    "a": "[Ar] 3dâµ 4sÂ¹",
+                    "q": "Anomalous configuration of Cr (Z = 24)?",
+                    "a": "[Ar] 3d⁵ 4s¹",
                     "opts": [
-                        "[Ar] 3dâµ 4sÂ¹",
-                        "[Ar] 3dâ´ 4sÂ²",
-                        "[Ar] 3dâ¶",
-                        "[Ar] 3dâµ 4sÂ²"
+                        "[Ar] 3d⁵ 4s¹",
+                        "[Ar] 3d⁴ 4s²",
+                        "[Ar] 3d⁶",
+                        "[Ar] 3d⁵ 4s²"
                     ]
                 },
                 {
@@ -9093,7 +9093,7 @@
                     ]
                 },
                 {
-                    "q": "Water (Hâ‚‚O) bonds are?",
+                    "q": "Water (H₂O) bonds are?",
                     "a": "Covalent",
                     "opts": [
                         "Covalent",
