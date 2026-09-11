@@ -83,13 +83,19 @@ function buildQuestions(settings) {
   const subjects = settings.mix ? Object.keys(questionBank) : [settings.subject];
   const topics = Array.isArray(settings.topics) ? settings.topics : [];
   const result = [];
+  const seen = new Set();
   subjects.forEach(subject => {
     const subjectBank = questionBank[subject];
     if (!subjectBank) return;
     Object.keys(subjectBank).forEach(topic => {
       if (!settings.mix && topics.length && !topics.includes(topic)) return;
       const pool = subjectBank[topic][settings.difficulty] || subjectBank[topic].easy || [];
-      pool.forEach(question => result.push({ ...question, subject, topic }));
+      pool.forEach(question => {
+        const key = String(question.q || '').trim().toLowerCase();
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        result.push({ ...question, subject, topic });
+      });
     });
   });
   return shuffle(result).slice(0, Math.max(1, Math.min(Number(settings.questions) || 10, 50)));

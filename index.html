@@ -1815,6 +1815,8 @@
     let topicStats = {};
     const seenQuestions = new Set();
 
+    function questionKey(text) { return String(text || '').trim().toLowerCase(); }
+
     const XP_PER_CORRECT = 15;
     const XP_PER_LEVEL = 100;
     const KB_LABELS = ['A', 'B', 'C', 'D'];
@@ -1914,7 +1916,7 @@
         if (!QB[subj]) return;
         activeTopics.filter(topic => QB[subj][topic]).forEach(topic => {
           const pool = QB[subj][topic][currentDiff] || QB[subj][topic].easy;
-          const unseen = (pool || []).filter(q => !seenQuestions.has(q.q));
+          const unseen = (pool || []).filter(q => !seenQuestions.has(questionKey(q.q)));
           if (unseen.length) availablePools.push({ subj, topic, questions: unseen });
         });
       });
@@ -1923,7 +1925,7 @@
       const selected = availablePools[Math.floor(Math.random() * availablePools.length)];
       const q = selected.questions[Math.floor(Math.random() * selected.questions.length)];
       const { subj, topic } = selected;
-      seenQuestions.add(q.q);
+      seenQuestions.add(questionKey(q.q));
       currentType = topic;
       return { ...q, subj };
     }
