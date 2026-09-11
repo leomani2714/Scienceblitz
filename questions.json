@@ -5309,7 +5309,7 @@
                     ]
                 },
                 {
-                    "q": "Boyle\u0027s Law: Pâ‚Vâ‚ = Pâ‚‚Vâ‚‚ at constant ?",
+                    "q": "Boyle's Law: P₁V₁ = P₂V₂ at constant ?",
                     "a": "Temperature",
                     "opts": [
                         "Temperature",
@@ -5319,7 +5319,7 @@
                     ]
                 },
                 {
-                    "q": "Q=mcÎ”T. m=2 kg, c=4200, Î”T=5. Q=?",
+                    "q": "Q = mcΔT. m = 2 kg, c = 4200 J/(kg·K), ΔT = 5 K. Q = ?",
                     "a": "42000 J",
                     "opts": [
                         "42000 J",
@@ -5781,7 +5781,7 @@
             ],
             "hard": [
                 {
-                    "q": "Carnot efficiency = 1 â€“ Tc/Th. Th=400K, Tc=300K. Î·=?",
+                    "q": "Carnot efficiency = 1 − Tc/Th. Th = 400 K, Tc = 300 K. η = ?",
                     "a": "25%",
                     "opts": [
                         "25%",
