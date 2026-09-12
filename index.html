@@ -1757,6 +1757,7 @@
       <h2>⏸ Paused</h2>
       <p>Take a breath…</p>
       <button class="ctrl-btn" id="resumeBtn">▶ Resume</button>
+      <button class="ctrl-btn" id="closePauseBtn" aria-label="Close pause popup">✕ Close</button>
       <button class="ctrl-btn" id="quitBtn">🚪 Quit Game</button>
     </div>
   </div>
@@ -2277,6 +2278,10 @@
       gamePaused = false; pauseOverlay.classList.remove('show');
       if (timerEnabled) startTimer();
     });
+    document.getElementById('closePauseBtn').addEventListener('click', () => {
+      gamePaused = false; pauseOverlay.classList.remove('show');
+      if (timerEnabled) startTimer();
+    });
     document.getElementById('quitBtn').addEventListener('click', () => {
       clearInterval(timerInterval); pauseOverlay.classList.remove('show');
       gameScreen.style.display = 'none';
@@ -2297,7 +2302,10 @@
       if (e.key === '4' || e.key === 'd') choicesGrid.querySelectorAll('.choice-btn')[3]?.click();
       if (e.key === 'h' || e.key === 'H') hintBtn.click();
       if (e.key === 's' || e.key === 'S') skipBtn.click();
-      if (e.key === 'Escape') pauseBtn.click();
+      if (e.key === 'Escape') {
+        if (pauseOverlay.classList.contains('show')) document.getElementById('closePauseBtn').click();
+        else pauseBtn.click();
+      }
     });
 
     // Theme toggle
